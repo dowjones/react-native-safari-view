@@ -13,7 +13,7 @@ RCT_EXPORT_MODULE()
 
 - (dispatch_queue_t)methodQueue
 {
-  return dispatch_get_main_queue();
+    return dispatch_get_main_queue();
 }
 
 - (void)startObserving
@@ -74,7 +74,7 @@ RCT_EXPORT_METHOD(show:(NSDictionary *)args resolver:(RCTPromiseResolveBlock)res
 
     // get the view controller closest to the foreground
     UIViewController *ctrl = RCTPresentedViewController();
-    
+
     // Display the Safari View
     [ctrl presentViewController:self.safariView animated:YES completion:nil];
 
@@ -95,16 +95,26 @@ RCT_EXPORT_METHOD(isAvailable:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromi
     }
 }
 
-RCT_EXPORT_METHOD(dismiss)
+RCT_EXPORT_METHOD(dismiss:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 {
-    [self safariViewControllerDidFinish:self.safariView];
+    if ([SFSafariViewController class]) {
+        [self dismissSafariViewController:self.safariView animated:YES completion:^{
+            resolve(@YES);
+        }];
+    } else {
+        reject(@"E_SAFARI_VIEW_UNAVAILABLE", @"SafariView is unavailable", nil);
+    }
 }
 
--(void)safariViewControllerDidFinish:(nonnull SFSafariViewController *)controller
+- (void)safariViewControllerDidFinish:(nonnull SFSafariViewController *)controller
 {
-    [controller dismissViewControllerAnimated:true completion:nil];
-    NSLog(@"[SafariView] SafariView dismissed.");
+    [self dismissSafariViewController:controller animated:YES completion:nil];
+}
 
+- (void)dismissSafariViewController:(nonnull SFSafariViewController *)controller animated:(BOOL)animated completion:(void (^ __nullable)(void))completion
+{
+    [controller dismissViewControllerAnimated:YES completion:completion];
+    
     if (hasListeners) {
         [self sendEventWithName:@"SafariViewOnDismiss" body:nil];
     }

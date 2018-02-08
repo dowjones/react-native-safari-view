@@ -24,7 +24,7 @@ export default {
   },
 
   dismiss() {
-    NativeSafariViewManager.dismiss();
+    return NativeSafariViewManager.dismiss();
   },
 
   isAvailable() {
