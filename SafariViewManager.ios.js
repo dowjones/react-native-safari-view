@@ -31,6 +31,10 @@ export default {
     return NativeSafariViewManager.isAvailable();
   },
 
+  isPresented() {
+    return NativeSafariViewManager.isPresented();
+  },
+
   addEventListener(event, listener) {
     if (event === 'onShow') {
       return eventEmitter.addListener('SafariViewOnShow', listener);

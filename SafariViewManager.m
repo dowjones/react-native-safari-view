@@ -110,4 +110,23 @@ RCT_EXPORT_METHOD(dismiss)
     }
 }
 
+RCT_EXPORT_METHOD(isPresented:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
+{
+    NSNumber *presented = @NO;
+    
+    if ([SFSafariViewController class]) {
+        if (self.safariView) {
+            UIViewController *presentedViewController = RCTPresentedViewController();
+            if (presentedViewController == self.safariView) {
+                presented = @YES;
+            }
+        }
+    }
+    else {
+        reject(@"E_SAFARI_VIEW_UNAVAILABLE", @"SafariView is unavailable", nil);
+    }
+    
+    resolve(presented);
+}
+
 @end
